@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Author</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="initializePage()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/books.html">Books</a></li>
+            <li><a href="/authors.html">Authors</a></li>
+            <li><a href="/community.html">Community</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;">
+    </div>
+</header>
+<main>
+    <section id="add-author">
+        <h2>Add New Author</h2>
+        <form id="add-author-form">
+            <label for="author-first-name">First Name:</label>
+            <input type="text" id="author-first-name" name="firstName" required>
+            <label for="author-last-name">Last Name:</label>
+            <input type="text" id="author-last-name" name="lastName" required>
+            <button type="submit">Add Author</button>
+        </form>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script src="scripts.js"></script>
+<script>
+    async function initializePage() {
+        await displayUserInfo();
+    }
+
+    async function addAuthor(event) {
+        event.preventDefault();
+        const firstName = document.getElementById("author-first-name").value;
+        const lastName = document.getElementById("author-last-name").value;
+
+        const response = await fetch("/api/authors", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify({ firstName, lastName })
+        });
+
+        if (response.ok) {
+            alert("Author added successfully");
+            window.location.href = '/authors.html';
+        } else {
+            alert("Failed to add author");
+        }
+    }
+
+    document.getElementById('add-author-form').addEventListener('submit', addAuthor);
+</script>
+</body>
+</html>

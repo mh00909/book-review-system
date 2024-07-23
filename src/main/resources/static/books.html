@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Books</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js"></script>
+    <script src="scripts.js"></script>
+</head>
+<body onload="initializePage()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/books.html">Books</a></li>
+            <li><a href="/authors.html">Authors</a></li>
+            <li><a href="/community.html">Community</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;"></div>
+</header>
+<main>
+    <section id="books">
+        <h2>Books</h2>
+        <div id="category-filters">
+            <h3>Filter by Category</h3>
+            <!-- Categories checklist will be dynamically loaded here -->
+        </div>
+        <div id="book-list">
+            <!-- Books will be dynamically loaded here -->
+        </div>
+        <div id="admin-functions" style="display: none; text-align: right;">
+            <button onclick="location.href='/add-book.html'">Add a New Book</button>
+            <button onclick="location.href='/add-category.html'">Add a New Category</button>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script>
+    async function initializePage() {
+        await displayUserInfo();
+        loadBooks();
+        if (isAdmin()) {
+            document.getElementById('admin-functions').style.display = 'block';
+        }
+    }
+
+    async function loadBooks() {
+        const response = await fetch('/api/books');
+        const books = await response.json();
+        displayBooks(books);
+        const categoryResponse = await fetch('/api/categories');
+        const categories = await categoryResponse.json();
+        displayCategoryFilters(categories);
+    }
+
+    function displayBooks(books) {
+        const bookList = document.getElementById('book-list');
+        bookList.innerHTML = '';
+        books.forEach(book => {
+            const bookItem = document.createElement('div');
+            bookItem.classList.add('book-item');
+            bookItem.innerHTML = `
+            <h4><a href="/book-details.html?id=${book.id}">${book.title}</a></h4>
+            <p>by ${book.author.firstName} ${book.author.lastName}</p>
+            ${isAdmin() ? `<button onclick="deleteBook(${book.id})">Delete</button>` : ''}
+        `;
+            bookList.appendChild(bookItem);
+        });
+    }
+
+    function displayCategoryFilters(categories) {
+        const categoryFilters = document.getElementById('category-filters');
+        categories.forEach(category => {
+            const categoryItem = document.createElement('div');
+            categoryItem.classList.add('category-item');
+            categoryItem.innerHTML = `
+            <input type="checkbox" id="category-${category.id}" name="category" value="${category.id}">
+            <label for="category-${category.id}">${category.name}</label>
+            ${isAdmin() ? `<button onclick="deleteCategory(${category.id})">Delete</button>` : ''}
+        `;
+            categoryFilters.appendChild(categoryItem);
+        });
+        categoryFilters.addEventListener('change', filterBooksByCategory);
+    }
+
+    async function filterBooksByCategory() {
+        const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
+        const response = await fetch(`/api/books/category/${selectedCategories.join(',')}`);
+        const books = await response.json();
+        displayBooks(books);
+    }
+
+    function isAdmin() {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role && payload.role === 'ROLE_ADMIN';
+    }
+
+
+
+
+
+
+</script>
+</body>
+</html>

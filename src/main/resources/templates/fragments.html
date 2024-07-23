@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fragments</title>
+    <link rel="stylesheet" th:href="@{/styles.css}">
+</head>
+<body>
+<!-- Header Fragment -->
+<div th:fragment="header">
+    <header>
+        <h1>Welcome to the Book Review System</h1>
+        <nav>
+            <a th:href="@{/home.html}">Home</a>
+            <a th:href="@{/login.html}">Login</a>
+            <a th:href="@{/register.html}">Register</a>
+        </nav>
+    </header>
+</div>
+
+<!-- Footer Fragment -->
+<div th:fragment="footer">
+    <footer>
+        <p>&copy; 2024 Book Review System</p>
+    </footer>
+</div>
+</body>
+</html>

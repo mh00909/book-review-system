@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <nav>
+        <header>
+            <nav>
+                <ul>
+                    <li><a href="/home.html">Home</a></li>
+                    <li><a href="/books.html">Books</a></li>
+                    <li><a href="/authors.html">Authors</a></li>
+                    <li><a href="/community.html">Community</a></li>
+                    <li><a href="/news.html">News</a></li>
+                    <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+                </ul>
+            </nav>
+        </header>
+
+    </nav>
+</header>
+<main>
+    <section id="login">
+        <h2>Sign in</h2>
+        <form id="login-form">
+            <label for="login-username">Username:</label>
+            <input type="text" id="login-username" name="username" required>
+
+            <label for="login-password">Password:</label>
+            <input type="password" id="login-password" name="password" required>
+
+            <button type="submit">Sign in</button>
+        </form>
+    </section>
+    <p>Don't have an account? <a href="/register.html">Sign up</a></p>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script src="scripts.js"></script>
+<script>
+    displayUserInfo();
+</script>
+</body>
+</html>

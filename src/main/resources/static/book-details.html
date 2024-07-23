@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="scripts.js"></script>
+</head>
+<body onload="initializePage()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/books.html">Books</a></li>
+            <li><a href="/authors.html">Authors</a></li>
+            <li><a href="/community.html">Community</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;"></div>
+</header>
+<main>
+    <section id="book-details">
+        <h2>Book Details</h2>
+        <div id="book-info">
+            <!-- Book details will be dynamically loaded here -->
+        </div>
+        <div id="review-form-container" style="display: none;">
+            <h3>Add a Review</h3>
+            <form id="add-review-form">
+                <label for="review-rating">Rating (1-10):</label>
+                <input type="number" id="review-rating" name="rating" min="1" max="10" required>
+                <label for="review-text">Review:</label>
+                <textarea id="review-text" name="review" rows="4" required></textarea>
+                <button type="submit">Submit Review</button>
+            </form>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script>
+    async function initializePage() {
+        await displayUserInfo();
+        await loadBookDetails();
+
+        if (isUser()) {
+            document.getElementById('review-form-container').style.display = 'block';
+        }
+    }
+
+    async function loadBookDetails() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id');
+        if (!bookId) {
+            alert("Book ID not found in URL");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/books/${bookId}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch book details");
+            }
+            const book = await response.json();
+            displayBookDetails(book);
+        } catch (error) {
+            console.error("Error loading book details:", error);
+        }
+    }
+
+    function displayBookDetails(book) {
+        const bookInfo = document.getElementById('book-info');
+        const categories = (book.categories || []).map(cat => cat.name).join(', ');
+        const reviews = (book.reviews || []).map(review => `<li>${review.content} - Rating: ${review.rating}</li>`).join('');
+        const readersCount = Array.isArray(book.readers) ? book.readers.length : 0;
+
+        bookInfo.innerHTML = `
+            <h3>${book.title}</h3>
+            <p><strong>Author:</strong> ${book.author.firstName} ${book.author.lastName}</p>
+            <p><strong>Categories:</strong> ${categories}</p>
+            <p><strong>Average Rating:</strong> ${book.averageRating.toFixed(2)}</p>
+            <p><strong>Number of Readers:</strong> ${readersCount}</p>
+            <h4>Reviews:</h4>
+            <ul>${reviews}</ul>
+        `;
+    }
+
+    function isUser() {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role && payload.role === 'ROLE_USER';
+    }
+
+    async function submitReview(event) {
+        event.preventDefault();
+        const urlParams = new URLSearchParams(window.location.search);
+        const bookId = urlParams.get('id');
+
+        const rating = document.getElementById("review-rating").value;
+        const content = document.getElementById("review-text").value;
+
+        const response = await fetch(`/api/books/${bookId}/reviews`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify({ rating, content })
+        });
+
+        if (response.ok) {
+            alert("Review submitted successfully");
+            window.location.reload();
+        } else {
+            alert("Failed to submit review");
+        }
+    }
+
+    document.getElementById('add-review-form').addEventListener('submit', submitReview);
+</script>
+</body>
+</html>

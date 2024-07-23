@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authors</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js"></script>
+</head>
+<body onload="initializePage()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/books.html">Books</a></li>
+            <li><a href="/authors.html">Authors</a></li>
+            <li><a href="/community.html">Community</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;">
+    </div>
+</header>
+<main>
+    <section id="authors">
+        <h2>Authors</h2>
+        <div id="author-list">
+        </div>
+        <div id="admin-functions" style="display: none; text-align: right;">
+            <button onclick="location.href='/add-author.html'">Add a New Author</button>
+        </div>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script src="scripts.js"></script>
+<script>
+    async function initializePage() {
+
+        await displayUserInfo();
+        loadAuthors();
+
+        if (isAdmin()) {
+            console.log("User is admin");
+            document.getElementById('admin-functions').style.display = 'block';
+        } else {
+            console.log("User is not admin");
+        }
+    }
+
+    async function loadAuthors() {
+        const response = await fetch('/api/authors');
+        const authors = await response.json();
+        displayAuthors(authors);
+    }
+
+    function displayAuthors(authors) {
+        const authorList = document.getElementById('author-list');
+        authorList.innerHTML = '';
+        authors.forEach(author => {
+            const authorItem = document.createElement('div');
+            authorItem.classList.add('author-item');
+            authorItem.innerHTML = `<h4>${author.firstName} ${author.lastName}</h4>`;
+            authorList.appendChild(authorItem);
+        });
+    }
+
+    function isAdmin() {
+        const token = localStorage.getItem('token');
+        console.log("Token:", token);
+        if (!token) return false;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log("Payload:", payload);
+        return payload.role && payload.role === 'ROLE_ADMIN';
+    }
+</script>
+</body>
+</html>
