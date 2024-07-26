@@ -18,7 +18,7 @@ public class Category {
 
     @Getter @Setter private String name;
 
-    @ManyToMany(mappedBy = "categories")
+    @ManyToMany(mappedBy = "categories",  fetch=FetchType.LAZY)
     @JsonIgnore
     @Getter @Setter private List<Book> books = new ArrayList<>();
 

@@ -2,6 +2,7 @@ package org.example.bookreview.DTOs;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.example.bookreview.model.Category;
 
 public class CategoryDTO {
     @Getter @Setter private Long id;

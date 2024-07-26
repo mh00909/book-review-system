@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Author Details</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="auth.js"></script>
+    <script src="scripts.js"></script>
+</head>
+<body onload="initializePage()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/books.html">Books</a></li>
+            <li><a href="/authors.html">Authors</a></li>
+            <li><a href="/community.html">Community</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="/reviews.html">Reviews</a></li>
+            <li><a href="/register.html">Register</a></li>
+            <li><a href="/account.html">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;"></div>
+</header>
+<main>
+    <section id="author-details">
+        <h2>Author Details</h2>
+        <div id="author-info"></div>
+        <h3>Books by this Author</h3>
+        <div id="book-list"></div>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script>
+    async function initializePage() {
+        await displayUserInfo();
+        loadAuthorDetails();
+    }
+
+    async function loadAuthorDetails() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const authorId = urlParams.get('id');
+        if (!authorId) {
+            alert("Author ID not found in URL");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/authors/${authorId}`);
+            if (!response.ok) {
+                throw new Error("Failed to fetch author details");
+            }
+            const author = await response.json();
+            displayAuthorDetails(author);
+        } catch (error) {
+            console.error("Error loading author details:", error);
+        }
+    }
+
+    function displayAuthorDetails(author) {
+        const authorInfo = document.getElementById('author-info');
+        authorInfo.innerHTML = `
+            <h3>${author.firstName} ${author.lastName}</h3>
+
+        `;
+
+        const bookList = document.getElementById('book-list');
+        bookList.innerHTML = '';
+        author.bookList.forEach(book => {
+            const bookItem = document.createElement('div');
+            bookItem.classList.add('book-item');
+            bookItem.innerHTML = `<h4><a href="/book-details.html?id=${book.id}">${book.title}</a></h4>`;
+            bookList.appendChild(bookItem);
+        });
+    }
+</script>
+</body>
+</html>

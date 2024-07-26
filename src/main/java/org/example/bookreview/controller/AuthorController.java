@@ -1,6 +1,7 @@
 package org.example.bookreview.controller;
 
-import org.example.bookreview.DTOs.AuthorRequest;
+import org.example.bookreview.DTOs.AuthorDTO;
+import org.example.bookreview.DTOs.AuthorSummaryDTO;
 import org.example.bookreview.model.Author;
 import org.example.bookreview.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,30 +16,23 @@ public class AuthorController {
     private AuthorService authorService;
 
     @GetMapping
-    public List<Author> getAllAuthors() {
+    public List<AuthorSummaryDTO> getAllAuthors() {
         return authorService.getAllAuthors();
     }
 
     @GetMapping("/{id}")
-    public Author getAuthorById(@PathVariable Long id) {
+    public AuthorDTO getAuthorById(@PathVariable Long id) {
         return authorService.getAuthorById(id);
     }
 
     @PostMapping
-    public Author createAuthor(@RequestBody AuthorRequest authorRequest) {
-        Author author = new Author();
-        author.setFirstName(authorRequest.getFirstName());
-        author.setLastName(authorRequest.getLastName());
-        return authorService.createAuthor(author);
+    public AuthorDTO createAuthor(@RequestBody AuthorSummaryDTO authorRequest) {
+        return authorService.createAuthor(authorRequest);
     }
 
     @PutMapping("/{id}")
-    public Author updateAuthor(@PathVariable Long id, @RequestBody AuthorRequest authorRequest) {
-        Author author = new Author();
-        author.setId(id);
-        author.setFirstName(authorRequest.getFirstName());
-        author.setLastName(authorRequest.getLastName());
-        return authorService.updateAuthor(id, author);
+    public AuthorDTO updateAuthor(@PathVariable Long id, @RequestBody AuthorSummaryDTO authorRequest) {
+        return authorService.updateAuthor(id, authorRequest);
     }
 
     @DeleteMapping("/{id}")

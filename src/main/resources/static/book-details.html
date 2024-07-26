@@ -20,7 +20,9 @@
             <li><a href="/authors.html">Authors</a></li>
             <li><a href="/community.html">Community</a></li>
             <li><a href="/news.html">News</a></li>
-            <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+            <li><a href="/reviews.html">Reviews</a></li>
+            <li><a href="/register.html">Register</a></li>
+            <li><a href="/account.html">My Account</a></li>
         </ul>
     </nav>
     <div id="user-info" style="float: right;"></div>
@@ -29,7 +31,6 @@
     <section id="book-details">
         <h2>Book Details</h2>
         <div id="book-info">
-            <!-- Book details will be dynamically loaded here -->
         </div>
         <div id="review-form-container" style="display: none;">
             <h3>Add a Review</h3>
@@ -70,6 +71,7 @@
                 throw new Error("Failed to fetch book details");
             }
             const book = await response.json();
+            console.log('Book data:', book);
             displayBookDetails(book);
         } catch (error) {
             console.error("Error loading book details:", error);
@@ -77,28 +79,37 @@
     }
 
     function displayBookDetails(book) {
+        if (!book) {
+            console.error("Book data is undefined or null");
+            return;
+        }
         const bookInfo = document.getElementById('book-info');
-        const categories = (book.categories || []).map(cat => cat.name).join(', ');
-        const reviews = (book.reviews || []).map(review => `<li>${review.content} - Rating: ${review.rating}</li>`).join('');
-        const readersCount = Array.isArray(book.readers) ? book.readers.length : 0;
+        if (!bookInfo) {
+            console.error("Book info container not found");
+            return;
+        }
+
+        const categories = book.categories ? book.categories.map(cat => cat.name).join(', ') : 'No categories available';
+        const reviews = book.reviews ? book.reviews.map(review =>
+            `<li>${review.text} - Rating: ${review.rating} - Author: ${review.username ? review.username : 'Anonymous'}</li>`).join('') : 'No reviews available';
 
         bookInfo.innerHTML = `
-            <h3>${book.title}</h3>
-            <p><strong>Author:</strong> ${book.author.firstName} ${book.author.lastName}</p>
-            <p><strong>Categories:</strong> ${categories}</p>
-            <p><strong>Average Rating:</strong> ${book.averageRating.toFixed(2)}</p>
-            <p><strong>Number of Readers:</strong> ${readersCount}</p>
-            <h4>Reviews:</h4>
-            <ul>${reviews}</ul>
-        `;
+        <h3>${book.title}</h3>
+        <p><strong>Author:</strong> ${book.author ? `${book.author.firstName} ${book.author.lastName}` : 'Unknown'}</p>
+        <p><strong>Categories:</strong> ${categories}</p>
+        <p><strong>Average Rating:</strong> ${book.averageRating ? book.averageRating.toFixed(1) : 'No ratings yet'}</p>
+        <p><strong>Number of Readers:</strong> ${book.numberOfReaders || 0}</p>
+        <h4>Reviews:</h4>
+        <ul>${reviews}</ul>
+        ${isAdmin() ? `<button onclick="deleteBook(${book.id})">Delete Book</button>` : ''}
+    `;
+
+        if (isUser()) {
+            document.getElementById('add-review-form').addEventListener('submit', submitReview);
+        }
     }
 
-    function isUser() {
-        const token = localStorage.getItem('token');
-        if (!token) return false;
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.role && payload.role === 'ROLE_USER';
-    }
+
 
     async function submitReview(event) {
         event.preventDefault();
@@ -125,7 +136,19 @@
         }
     }
 
-    document.getElementById('add-review-form').addEventListener('submit', submitReview);
+    function isAdmin() {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role && payload.role === 'ROLE_ADMIN';
+    }
+
+    function isUser() {
+        const token = localStorage.getItem('token');
+        if (!token) return false;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role && payload.role === 'ROLE_USER';
+    }
 </script>
 </body>
 </html>

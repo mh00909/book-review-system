@@ -7,36 +7,29 @@ import org.example.bookreview.model.Category;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookDTO {
     @Getter @Setter private Long id;
     @Getter @Setter private String title;
-    @Getter @Setter private AuthorDTO author;
+    @Getter @Setter private AuthorSummaryDTO author;
     @Getter @Setter private List<CategoryDTO> categories;
     @Getter @Setter private List<ReviewDTO> reviews;
+    @Getter @Setter private int numberOfReaders;
     @Getter @Setter private double averageRating;
 
 
-    public BookDTO(Long id, String title, AuthorDTO author, List<CategoryDTO> categories, List<ReviewDTO> reviews, double averageRating) {
+    public BookDTO(Long id, String title, AuthorSummaryDTO author, List<CategoryDTO> categories,
+                   List<ReviewDTO> reviews, int numberOfReaders, double averageRating) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.categories = categories;
-        this.averageRating = averageRating;
         this.reviews = reviews;
+        this.numberOfReaders = numberOfReaders;
+        this.averageRating = averageRating;
     }
 
-    public BookDTO(Book book) {
-        this.id = book.getId();
-        this.title = book.getTitle();
-        this.author = new AuthorDTO(book.getAuthor());
-        this.categories = new ArrayList<CategoryDTO>();
 
-        for(Category category : book.getCategories()) {
-            CategoryDTO c = new CategoryDTO(category.getId(), category.getName());
-            categories.add(c);
-        }
 
-        this.averageRating = book.getAverageRating();
-    }
 }

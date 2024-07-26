@@ -12,4 +12,4 @@ spring:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
 jwt:
   secret: your_jwt_secret_key
-  expiration: 86400000  # 1 day in milliseconds
+  expiration: 86400000

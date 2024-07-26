@@ -1,6 +1,5 @@
 package org.example.bookreview.auth;
 
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.bookreview.model.ERole;

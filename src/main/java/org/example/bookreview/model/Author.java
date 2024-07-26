@@ -18,7 +18,15 @@ public class Author {
     @Getter @Setter private String firstName;
     @Getter @Setter private String lastName;
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author", fetch=FetchType.LAZY)
     @JsonBackReference
     @Getter @Setter private List<Book> bookList = new ArrayList<>();
+
+    public Author (){}
+    public Author(Long id, String firstName, String lastName) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
 }

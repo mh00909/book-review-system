@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.example.bookreview.DTOs.BookDTO;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,7 @@ public class Book {
     @Getter @Setter private Author author;
 
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true,  fetch=FetchType.LAZY)
     @Getter @Setter private List<Review> reviews = new ArrayList<>();
 
     @ManyToMany(mappedBy = "readBooks")
@@ -37,6 +38,8 @@ public class Book {
     @Getter @Setter private List<Category> categories = new ArrayList<>();
 
     @Getter @Setter private double averageRating;
+
+
 
     public void calculateAverageRating() {
         if (reviews.isEmpty()) {

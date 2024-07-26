@@ -16,7 +16,9 @@
             <li><a href="/authors.html">Authors</a></li>
             <li><a href="/community.html">Community</a></li>
             <li><a href="/news.html">News</a></li>
-            <li><a href="#" onclick="redirectToAccountIfAuthenticated(); return false;">My Account</a></li>
+            <li><a href="/reviews.html">Reviews</a></li>
+            <li><a href="/register.html">Register</a></li>
+            <li><a href="/account.html">My Account</a></li>
         </ul>
     </nav>
     <div id="user-info" style="float: right;">
@@ -45,8 +47,6 @@
         if (isAdmin()) {
             console.log("User is admin");
             document.getElementById('admin-functions').style.display = 'block';
-        } else {
-            console.log("User is not admin");
         }
     }
 
@@ -62,7 +62,7 @@
         authors.forEach(author => {
             const authorItem = document.createElement('div');
             authorItem.classList.add('author-item');
-            authorItem.innerHTML = `<h4>${author.firstName} ${author.lastName}</h4>`;
+            authorItem.innerHTML = `<h4><a href="/author-details.html?id=${author.id}">${author.firstName} ${author.lastName}</a></h4>`;
             authorList.appendChild(authorItem);
         });
     }

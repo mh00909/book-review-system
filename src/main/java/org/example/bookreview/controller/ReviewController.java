@@ -1,5 +1,7 @@
 package org.example.bookreview.controller;
 
+import org.example.bookreview.DTOs.ReviewDTO;
+import org.example.bookreview.DTOs.ReviewRequest;
 import org.example.bookreview.model.Review;
 import org.example.bookreview.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,31 +10,26 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
     @GetMapping
-    public List<Review> getAllReviews() {
+    public List<ReviewDTO> getAllReviews() {
         return reviewService.getAllReviews();
     }
 
     @GetMapping("/{id}")
-    public Review getReviewById(@PathVariable Long id) {
+    public ReviewDTO getReviewById(@PathVariable Long id) {
         return reviewService.getReviewById(id);
     }
 
     @PostMapping
-    public Review createReview(@RequestBody Review review) {
-        return reviewService.createReview(review);
+    public ReviewDTO createReview(@RequestBody ReviewRequest review) {
+        return reviewService.addReview(review.getBookId(), review);
     }
 
-    @PutMapping("/{id}")
-    public Review updateReview(@PathVariable Long id, @RequestBody Review review) {
-        review.setId(id);
-        return reviewService.updateReview(review);
-    }
 
     @DeleteMapping("/{id}")
     public void deleteReview(@PathVariable Long id) {

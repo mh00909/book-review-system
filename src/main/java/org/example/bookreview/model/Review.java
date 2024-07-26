@@ -28,4 +28,13 @@ public class Review {
     public void updateBookRating() {
         book.calculateAverageRating();
     }
+
+    public Review(){}
+    public Review(Long id, String text, int rating, User user, Book book) {
+        this.id = id;
+        this.text = text;
+        this.rating = rating;
+        this.user = user;
+        this.book = book;
+    }
 }
