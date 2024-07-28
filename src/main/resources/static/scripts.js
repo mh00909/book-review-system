@@ -156,50 +156,6 @@ async function addCategory(event) {
 
 
 
-async function addReview(event) {
-    event.preventDefault();
-    const book = document.getElementById("review-book").value;
-    const content = document.getElementById("review-content").value;
-    const rating = document.getElementById("review-rating").value;
-
-    const response = await fetch("/api/books/review", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("token")
-        },
-        body: JSON.stringify({ book, content, rating })
-    });
-
-    if (response.ok) {
-        alert("Review added successfully");
-    } else {
-        alert("Failed to add review");
-    }
-}
-
-async function markBookAsRead(event) {
-    event.preventDefault();
-    const book = document.getElementById("read-book").value;
-
-    const response = await fetch("/api/books/mark-read", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer " + localStorage.getItem("token")
-        },
-        body: JSON.stringify({ book })
-    });
-
-    if (response.ok) {
-        alert("Book marked as read");
-    } else {
-        alert("Failed to mark book as read");
-    }
-}
-
-
-
 async function deleteBook(bookId) {
     if (!confirm("Are you sure you want to delete this book?")) {
         return;

@@ -2,12 +2,8 @@ package org.example.bookreview.DTOs;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.example.bookreview.model.Book;
-import org.example.bookreview.model.Category;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 public class BookDTO {
     @Getter @Setter private Long id;

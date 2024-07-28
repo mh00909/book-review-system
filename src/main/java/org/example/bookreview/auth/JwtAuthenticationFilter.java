@@ -1,5 +1,6 @@
 package org.example.bookreview.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,7 +28,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String username = null;
             if (header != null && header.startsWith("Bearer ")) {
                 token = header.substring(7);
-                username = jwtUtils.extractUsername(token);
+                try {
+                    username = jwtUtils.extractUsername(token);
+                } catch (ExpiredJwtException e) {
+
+                    logger.warn("JWT token has expired");
+
+                }
             }
 
 

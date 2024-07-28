@@ -14,5 +14,4 @@ public class AuthorSummaryDTO {
         this.lastName = lastName;
     }
 
-    public AuthorSummaryDTO(){}
 }

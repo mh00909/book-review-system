@@ -3,7 +3,7 @@ package org.example.bookreview.DTOs;
 import lombok.Getter;
 import lombok.Setter;
 
-public class BookSummaryDTO { // to avoid cyclic dependency
+public class BookSummaryDTO {
 
     @Getter @Setter private long id;
     @Getter @Setter private String title;

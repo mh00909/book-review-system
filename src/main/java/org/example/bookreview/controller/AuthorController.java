@@ -2,7 +2,6 @@ package org.example.bookreview.controller;
 
 import org.example.bookreview.DTOs.AuthorDTO;
 import org.example.bookreview.DTOs.AuthorSummaryDTO;
-import org.example.bookreview.model.Author;
 import org.example.bookreview.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

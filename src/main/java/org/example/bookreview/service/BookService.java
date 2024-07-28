@@ -11,11 +11,7 @@ import org.example.bookreview.repository.BookRepository;
 import org.example.bookreview.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.example.bookreview.DTOs.ReviewDTO;
-import org.example.bookreview.DTOs.AuthorDTO;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class BookService {
@@ -34,6 +30,7 @@ public class BookService {
     public BookDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+        book.calculateAverageRating();
         return BookMapper.toDTO(book);
     }
 

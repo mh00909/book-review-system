@@ -54,7 +54,7 @@ public class BookController {
 
     @PostMapping("/{bookId}/reviews")
     public ReviewDTO addReview(@PathVariable Long bookId, @RequestBody ReviewRequest reviewRequest) {
-        return reviewService.addReview(bookId, reviewRequest);
+        return reviewService.addReviewOrUpdate(bookId, reviewRequest);
     }
 
     @GetMapping("/{bookId}/reviews")

@@ -33,7 +33,7 @@
         <div id="book-info">
         </div>
         <div id="review-form-container" style="display: none;">
-            <h3>Add a Review</h3>
+            <h3>Add or Edit Review</h3>
             <form id="add-review-form">
                 <label for="review-rating">Rating (1-10):</label>
                 <input type="number" id="review-rating" name="rating" min="1" max="10" required>
@@ -51,15 +51,14 @@
     async function initializePage() {
         await displayUserInfo();
         await loadBookDetails();
-
-        if (isUser()) {
-            document.getElementById('review-form-container').style.display = 'block';
-        }
     }
 
     async function loadBookDetails() {
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = urlParams.get('id');
+
+        console.log("Loading details for book ID:", bookId);
+
         if (!bookId) {
             alert("Book ID not found in URL");
             return;
@@ -71,10 +70,45 @@
                 throw new Error("Failed to fetch book details");
             }
             const book = await response.json();
-            console.log('Book data:', book);
+
+            console.log("Book data:", book);
+
             displayBookDetails(book);
+
+            if (isUser()) {
+                const userReview = book.reviews.find(review => review.userId === getCurrentUserId());
+                if (userReview) {
+                    console.log("Populating review form with existing review:", userReview);
+                    populateReviewForm(userReview);
+                } else {
+                    console.log("No review found for current user. Displaying review form.");
+                    document.getElementById('review-form-container').style.display = 'block';
+                }
+            }
         } catch (error) {
             console.error("Error loading book details:", error);
+        }
+    }
+
+    function populateReviewForm(review) {
+        document.getElementById('review-rating').value = review.rating;
+        document.getElementById('review-text').value = review.text;
+        document.getElementById('review-form-container').style.display = 'block';
+    }
+
+    function getCurrentUserId() {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log("No token found in localStorage");
+            return null;
+        }
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            console.log("Current user ID:", payload.userId);
+            return payload.userId;
+        } catch (error) {
+            console.error("Error parsing token payload:", error);
+            return null;
         }
     }
 
@@ -91,7 +125,7 @@
 
         const categories = book.categories ? book.categories.map(cat => cat.name).join(', ') : 'No categories available';
         const reviews = book.reviews ? book.reviews.map(review =>
-            `<li>${review.text} - Rating: ${review.rating} - Author: ${review.username ? review.username : 'Anonymous'}</li>`).join('') : 'No reviews available';
+            `<li>${review.text} - Rating: ${review.rating} - Author: ${review.username || 'Anonymous'}</li>`).join('') : 'No reviews available';
 
         bookInfo.innerHTML = `
         <h3>${book.title}</h3>
@@ -102,22 +136,23 @@
         <h4>Reviews:</h4>
         <ul>${reviews}</ul>
         ${isAdmin() ? `<button onclick="deleteBook(${book.id})">Delete Book</button>` : ''}
-    `;
+        `;
 
         if (isUser()) {
             document.getElementById('add-review-form').addEventListener('submit', submitReview);
         }
     }
 
-
-
     async function submitReview(event) {
         event.preventDefault();
-        const urlParams = new URLSearchParams(window.location.search);
-        const bookId = urlParams.get('id');
-
+        const bookId = new URLSearchParams(window.location.search).get('id');
         const rating = document.getElementById("review-rating").value;
         const content = document.getElementById("review-text").value;
+
+        console.log("Submitting review for book ID:", bookId, "with rating:", rating, "and content:", content);
+
+        const userId = getCurrentUserId();
+        console.log("Current user ID:", userId);
 
         const response = await fetch(`/api/books/${bookId}/reviews`, {
             method: "POST",
@@ -125,7 +160,7 @@
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + localStorage.getItem("token")
             },
-            body: JSON.stringify({ rating, content })
+            body: JSON.stringify({ rating, content, userId, bookId })
         });
 
         if (response.ok) {
@@ -135,6 +170,7 @@
             alert("Failed to submit review");
         }
     }
+
 
     function isAdmin() {
         const token = localStorage.getItem('token');

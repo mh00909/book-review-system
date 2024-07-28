@@ -8,6 +8,8 @@ import org.example.bookreview.model.User;
 import org.example.bookreview.repository.BookRepository;
 import org.example.bookreview.repository.ReviewRepository;
 import org.example.bookreview.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.bookreview.DTOs.ReviewRequest;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
+    private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
 
     @Autowired
     private ReviewRepository reviewRepository;
@@ -34,22 +37,26 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
-    public ReviewDTO addReview(Long bookId, ReviewRequest reviewRequest) {
+    public ReviewDTO addReviewOrUpdate(Long bookId, ReviewRequest reviewRequest) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new IllegalArgumentException("Book not found"));
 
         User user = userRepository.findById(reviewRequest.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        Review review = new Review();
+        Review review = reviewRepository.findByBookIdAndUserId(bookId, user.getId())
+                .orElse(new Review());
+
         review.setBook(book);
         review.setUser(user);
         review.setRating(reviewRequest.getRating());
         review.setText(reviewRequest.getContent());
 
         Review savedReview = reviewRepository.save(review);
+        logger.debug("Review saved: {}", savedReview);
         return ReviewMapper.toDTO(savedReview);
     }
+
 
     public ReviewDTO getReviewById(Long reviewId) {
         Review review = reviewRepository.findById(reviewId)
