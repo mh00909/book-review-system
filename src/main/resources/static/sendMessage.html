@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Message</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/messages.html">Messages</a></li>
+            <li><a href="/sendMessage.html">Send Message</a></li>
+            <li><a href="/account.html">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;"></div>
+</header>
+<main>
+    <section id="send-message">
+        <h2>Send Message</h2>
+        <form id="send-message-form">
+            <label for="receiver-username">To (Username):</label>
+            <input type="text" id="receiver-username" name="receiverUsername" required>
+            <label for="message-content">Message:</label>
+            <textarea id="message-content" name="content" rows="4" required></textarea>
+            <button type="submit">Send</button>
+        </form>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        displayUserInfo();
+    });
+
+    document.getElementById('send-message-form').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const receiverUsername = document.getElementById('receiver-username').value;
+        const content = document.getElementById('message-content').value;
+
+        try {
+            const response = await fetch('/api/messages', {
+                method: 'POST',
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                },
+                body: JSON.stringify({ receiverUsername, content })
+            });
+
+            if (response.ok) {
+                alert("Message sent successfully");
+                document.getElementById('send-message-form').reset();
+            } else {
+                alert("Failed to send message");
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+        }
+    });
+</script>
+</body>
+</html>

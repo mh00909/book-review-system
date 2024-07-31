@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Community</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js"></script>
 </head>
-<body>
+<body onload="loadUsers()">
 <header>
     <nav>
         <ul>
@@ -25,18 +24,44 @@
     </div>
 </header>
 <main>
-    <section id="newbooks">
-
-    </section>
+    <h2>Community</h2>
+    <ul id="user-list"></ul>
 </main>
 <footer>
     <p>&copy; 2024 BookRev</p>
 </footer>
 <script src="scripts.js"></script>
+<script src="auth.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         displayUserInfo();
+        loadUsers();
     });
+    async function loadUsers() {
+        try {
+            const response = await fetch('/api/user/users');
+            if (response.ok) {
+                const users = await response.json();
+                const userList = document.getElementById('user-list');
+                userList.innerHTML = '';
+                users.forEach(user => {
+                    if(user.username !== "admin") {
+                        const listItem = document.createElement('li');
+                        const link = document.createElement('a');
+                        link.href = `/user.html?username=${encodeURIComponent(user.username)}`;
+                        link.textContent = user.username;
+                        listItem.appendChild(link);
+                        userList.appendChild(listItem);
+                    }
+
+                });
+            } else {
+                alert("Failed to load users");
+            }
+        } catch (error) {
+            console.error("Error loading users:", error);
+        }
+    }
 </script>
 </body>
 </html>

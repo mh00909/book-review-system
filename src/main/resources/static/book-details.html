@@ -8,8 +8,6 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="auth.js"></script>
-    <script src="scripts.js"></script>
 </head>
 <body onload="initializePage()">
 <header>
@@ -32,7 +30,7 @@
         <h2>Book Details</h2>
         <div id="book-info">
         </div>
-        <div id="review-form-container" style="display: none;">
+        <div id="review-form-container" class="review-form-container" style="display: none;">
             <h3>Add or Edit Review</h3>
             <form id="add-review-form">
                 <label for="review-rating">Rating (1-10):</label>
@@ -47,6 +45,8 @@
 <footer>
     <p>&copy; 2024 BookRev</p>
 </footer>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
 <script>
     async function initializePage() {
         await displayUserInfo();
@@ -111,37 +111,102 @@
             return null;
         }
     }
-
     function displayBookDetails(book) {
-        if (!book) {
-            console.error("Book data is undefined or null");
-            return;
-        }
         const bookInfo = document.getElementById('book-info');
-        if (!bookInfo) {
-            console.error("Book info container not found");
-            return;
-        }
+        const userId = getCurrentUserId();
 
         const categories = book.categories ? book.categories.map(cat => cat.name).join(', ') : 'No categories available';
-        const reviews = book.reviews ? book.reviews.map(review =>
-            `<li>${review.text} - Rating: ${review.rating} - Author: ${review.username || 'Anonymous'}</li>`).join('') : 'No reviews available';
+
+        const reviews = book.reviews ? book.reviews.map(review => {
+
+            const helpfulUserIds = Array.isArray(review.helpfulUserIds) ? review.helpfulUserIds : [];
+            const isHelpful = helpfulUserIds.includes(userId);
+            const buttonText = isHelpful ? "Unmark as Helpful" : "Mark as Helpful";
+            const buttonAction = isHelpful ? `unmarkAsHelpful(${review.id})` : `markAsHelpful(${review.id})`;
+
+            return `<div class="review-card">
+                    <p><strong>${review.username || 'Anonymous'}</strong> rated this book ${review.rating}/10</p>
+                    <p>${review.text}</p>
+                    <p>
+                        <button id="helpful-button-${review.id}" onclick="${buttonAction}">${buttonText} (${review.helpfulCount || 0})</button>
+                    </p>
+                </div>`;
+        }).join('') : 'No reviews available';
 
         bookInfo.innerHTML = `
+    <div class="book-header">
         <h3>${book.title}</h3>
         <p><strong>Author:</strong> ${book.author ? `${book.author.firstName} ${book.author.lastName}` : 'Unknown'}</p>
         <p><strong>Categories:</strong> ${categories}</p>
         <p><strong>Average Rating:</strong> ${book.averageRating ? book.averageRating.toFixed(1) : 'No ratings yet'}</p>
         <p><strong>Number of Readers:</strong> ${book.numberOfReaders || 0}</p>
-        <h4>Reviews:</h4>
-        <ul>${reviews}</ul>
-        ${isAdmin() ? `<button onclick="deleteBook(${book.id})">Delete Book</button>` : ''}
-        `;
-
+    </div>
+    <h4>Reviews:</h4>
+    <div class="reviews-container">${reviews}</div>`;
         if (isUser()) {
             document.getElementById('add-review-form').addEventListener('submit', submitReview);
         }
     }
+
+
+
+    async function markAsHelpful(reviewId) {
+        try {
+            const response = await fetch(`/api/reviews/${reviewId}/helpful`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
+            });
+
+            if (response.ok) {
+                const button = document.getElementById(`helpful-button-${reviewId}`);
+                if (button) {
+                    const currentCount = parseInt(button.textContent.match(/\d+/)[0]) || 0;
+                    button.textContent = `Unmark as Helpful (${currentCount + 1})`;
+                    button.onclick = () => unmarkAsHelpful(reviewId);
+                } else {
+                    console.error(`Button with ID helpful-button-${reviewId} not found`);
+                }
+            } else {
+                console.error(`Failed to mark as helpful. Status: ${response.status}`);
+                alert("Failed to mark as helpful");
+            }
+        } catch (error) {
+            console.error("Error marking review as helpful:", error);
+            alert("An error occurred. Please try again.");
+        }
+    }
+
+
+    async function unmarkAsHelpful(reviewId) {
+        try {
+            const response = await fetch(`/api/reviews/${reviewId}/unhelpful`, {
+                method: 'POST',
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
+            });
+
+            if (response.ok) {
+                const button = document.getElementById(`helpful-button-${reviewId}`);
+                if (button) {
+                    const currentCount = parseInt(button.textContent.match(/\d+/)[0]) || 0;
+                    button.textContent = `Mark as Helpful (${currentCount - 1})`;
+                    button.onclick = () => markAsHelpful(reviewId);
+                } else {
+                    console.error(`Button with ID helpful-button-${reviewId} not found`);
+                }
+            } else {
+                console.error(`Failed to unmark as helpful. Status: ${response.status}`);
+                alert("Failed to unmark as helpful");
+            }
+        } catch (error) {
+            console.error("Error unmarking review as helpful:", error);
+            alert("An error occurred. Please try again.");
+        }
+    }
+
 
     async function submitReview(event) {
         event.preventDefault();
@@ -170,7 +235,6 @@
             alert("Failed to submit review");
         }
     }
-
 
     function isAdmin() {
         const token = localStorage.getItem('token');

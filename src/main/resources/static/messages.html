@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body onload="loadMessages()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/messages.html">Messages</a></li>
+            <li><a href="/sendMessage.html">Send Message</a></li>
+            <li><a href="/account.html">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;"></div>
+</header>
+<main>
+    <section id="messages">
+        <h2>Your Messages</h2>
+        <ul id="message-list"></ul>
+    </section>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        displayUserInfo();
+    });
+
+    async function loadMessages() {
+        try {
+            const response = await fetch('/api/messages', {
+                headers: {
+                    "Authorization": "Bearer " + localStorage.getItem("token")
+                }
+            });
+
+            if (response.ok) {
+                const messages = await response.json();
+                const messageList = document.getElementById('message-list');
+                messageList.innerHTML = '';
+                messages.forEach(message => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${message.senderName}: ${message.content} (${new Date(message.timestamp).toLocaleString()})`;
+                    messageList.appendChild(listItem);
+                });
+            } else {
+                alert("Failed to load messages");
+            }
+        } catch (error) {
+            console.error("Error loading messages:", error);
+        }
+    }
+</script>
+</body>
+</html>

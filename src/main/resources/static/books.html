@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Books</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js"></script>
-    <script src="scripts.js"></script>
 </head>
 <body onload="initializePage()">
 <header>
@@ -29,6 +27,10 @@
         <h2>Books</h2>
         <div id="category-filters">
             <h3>Filter by Category</h3>
+            <div class="category-item">
+                <input type="radio" id="category-all" name="category" value="all" checked>
+                <label for="category-all"><u>All</u></label>
+            </div>
         </div>
         <div id="book-list">
         </div>
@@ -41,6 +43,8 @@
 <footer>
     <p>&copy; 2024 BookRev</p>
 </footer>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
 <script>
     async function initializePage() {
         await displayUserInfo();
@@ -80,7 +84,7 @@
             const categoryItem = document.createElement('div');
             categoryItem.classList.add('category-item');
             categoryItem.innerHTML = `
-            <input type="checkbox" id="category-${category.id}" name="category" value="${category.id}">
+            <input type="radio" id="category-${category.id}" name="category" value="${category.id}">
             <label for="category-${category.id}">${category.name}</label>
             ${isAdmin() ? `<button onclick="deleteCategory(${category.id})">Delete</button>` : ''}
         `;
@@ -90,8 +94,13 @@
     }
 
     async function filterBooksByCategory() {
-        const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked')).map(cb => cb.value);
-        const response = await fetch(`/api/books/category/${selectedCategories.join(',')}`);
+        const selectedCategory = document.querySelector('input[name="category"]:checked').value;
+        let response;
+        if (selectedCategory === 'all') {
+            response = await fetch('/api/books');
+        } else {
+            response = await fetch(`/api/books/category/${selectedCategory}`);
+        }
         const books = await response.json();
         displayBooks(books);
     }
@@ -102,12 +111,6 @@
         const payload = JSON.parse(atob(token.split('.')[1]));
         return payload.role && payload.role === 'ROLE_ADMIN';
     }
-
-
-
-
-
-
 </script>
 </body>
 </html>

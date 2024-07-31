@@ -1,5 +1,7 @@
 package org.example.bookreview.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,11 +21,12 @@ public class Book {
 
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @JsonManagedReference
+    @JsonBackReference
     @Getter @Setter private Author author;
 
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true,  fetch=FetchType.LAZY)
+    @JsonIgnore
     @Getter @Setter private List<Review> reviews = new ArrayList<>();
 
     @ManyToMany(mappedBy = "readBooks")

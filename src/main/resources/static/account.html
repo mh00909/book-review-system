@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js"></script>
 </head>
-<body onload="redirectToLoginIfNotAuthenticated()">
+<body onload="initializeAccountPage()">
 <header>
     <nav>
         <ul>
@@ -19,24 +18,114 @@
             <li><a href="/account.html">My Account</a></li>
         </ul>
     </nav>
-    <div id="user-info" style="float: right;">
-
-    </div>
+    <div id="user-info" style="float: right;"></div>
 </header>
 <main>
     <section id="account">
         <h2>My Account</h2>
         <p>Welcome to your account page!</p>
-
+        <p>Messages: <a href="/messages.html"> Send a message</a> </p>
+        <div id="user-details">
+            <p><strong>First Name:</strong> <span id="first-name"></span></p>
+            <p><strong>Last Name:</strong> <span id="last-name"></span></p>
+            <p><strong>Number of Reviews:</strong> <span id="review-count"></span></p>
+            <h3>Your Reviews</h3>
+            <ul id="review-list"></ul>
+        </div>
+        <button onclick="showEditForm()">Edit</button>
+        <div id="edit-form" style="display: none;">
+            <h3>Edit User Details</h3>
+            <label for="first-name-input">First Name:</label>
+            <input type="text" id="first-name-input" />
+            <label for="last-name-input">Last Name:</label>
+            <input type="text" id="last-name-input" />
+            <button onclick="updateUserDetails()">Save Changes</button>
+            <button onclick="hideEditForm()">Cancel</button>
+        </div>
     </section>
 </main>
 <footer>
     <p>&copy; 2024 BookRev</p>
 </footer>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        displayUserInfo();
-    });
+    async function initializeAccountPage() {
+        const token = localStorage.getItem("token");
+        if (!token || token.trim() === "") {
+            alert("Login or register");
+            window.location.href = "login.html";
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/user/profile', {
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                document.getElementById('first-name').textContent = data.firstName;
+                document.getElementById('last-name').textContent = data.lastName;
+                document.getElementById('first-name-input').value = data.firstName;
+                document.getElementById('last-name-input').value = data.lastName;
+                document.getElementById('review-count').textContent = data.reviews.length;
+
+                const reviewList = document.getElementById('review-list');
+                reviewList.innerHTML = '';
+                data.reviews.forEach(review => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${review.text} - Rating: ${review.rating}`;
+                    reviewList.appendChild(listItem);
+                });
+            } else {
+                alert("Failed to load user details");
+            }
+        } catch (error) {
+            console.error("Error fetching user profile:", error);
+            window.location.href = "login.html";
+        }
+    }
+    function showEditForm() {
+        document.getElementById('edit-form').style.display = 'block';
+    }
+
+    function hideEditForm() {
+        document.getElementById('edit-form').style.display = 'none';
+    }
+
+    async function updateUserDetails() {
+        const token = localStorage.getItem("token");
+        const firstName = document.getElementById("first-name-input").value;
+        const lastName = document.getElementById("last-name-input").value;
+
+        try {
+            const response = await fetch('/api/user/update', {
+                method: 'PUT',
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ firstName, lastName })
+            });
+
+            if (response.ok) {
+                alert("User details updated successfully");
+                hideEditForm();
+                initializeAccountPage();
+            } else {
+                alert("Failed to update user details");
+            }
+        } catch (error) {
+            console.error("Error updating user details:", error);
+            alert("An error occurred while updating details");
+        }
+    }
+
+
 </script>
 </body>
 </html>

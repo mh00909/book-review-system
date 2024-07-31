@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="styles.css">
+
+</head>
+<body onload="loadUserProfile()">
+<header>
+    <nav>
+        <ul>
+            <li><a href="/home.html">Home</a></li>
+            <li><a href="/books.html">Books</a></li>
+            <li><a href="/authors.html">Authors</a></li>
+            <li><a href="/community.html">Community</a></li>
+            <li><a href="/news.html">News</a></li>
+            <li><a href="/reviews.html">Reviews</a></li>
+            <li><a href="/register.html">Register</a></li>
+            <li><a href="/account.html">My Account</a></li>
+        </ul>
+    </nav>
+    <div id="user-info" style="float: right;">
+    </div>
+</header>
+<main>
+    <h2>User Profile</h2>
+    <div id="user-details">
+        <p><strong>Username:</strong> <span id="username"></span></p>
+        <p><strong>First Name:</strong> <span id="first-name"></span></p>
+        <p><strong>Last Name:</strong> <span id="last-name"></span></p>
+        <p><strong>Number of Reviews:</strong> <span id="review-count"></span></p>
+        <h3>Reviews</h3>
+        <ul id="review-list"></ul>
+    </div>
+</main>
+<footer>
+    <p>&copy; 2024 BookRev</p>
+</footer>
+<script src="scripts.js"></script>
+<script src="auth.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        displayUserInfo();
+    });
+    async function loadUserProfile() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const username = urlParams.get('username');
+
+        if (!username) {
+            alert("User not specified");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/user/by-username/${username}`);
+            if (response.ok) {
+                const user = await response.json();
+                document.getElementById('username').textContent = user.username;
+                document.getElementById('first-name').textContent = user.firstName;
+                document.getElementById('last-name').textContent = user.lastName;
+                document.getElementById('review-count').textContent = user.reviews.length;
+
+                const reviewList = document.getElementById('review-list');
+                reviewList.innerHTML = '';
+                user.reviews.forEach(review => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${review.text} - Rating: ${review.rating}`;
+                    reviewList.appendChild(listItem);
+                });
+            } else {
+                alert("Failed to load user profile");
+            }
+        } catch (error) {
+            console.error("Error loading user profile:", error);
+        }
+    }
+</script>
+</body>
+</html>

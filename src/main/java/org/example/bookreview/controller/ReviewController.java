@@ -5,6 +5,7 @@ import org.example.bookreview.DTOs.ReviewRequest;
 import org.example.bookreview.service.ReviewService;
 import org.example.bookreview.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,4 +32,19 @@ public class ReviewController {
     public void deleteReview(@PathVariable Long id) {
         reviewService.deleteReview(id);
     }
+
+    @PostMapping("/{id}/helpful")
+    public ResponseEntity<Void> markReviewAsHelpful(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        Long userId = userService.getUserIdFromToken(token);
+        reviewService.markReviewAsHelpful(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/unhelpful")
+    public ResponseEntity<Void> unmarkReviewAsHelpful(@PathVariable Long id, @RequestHeader("Authorization") String token) {
+        Long userId = userService.getUserIdFromToken(token);
+        reviewService.unmarkReviewAsHelpful(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
 }

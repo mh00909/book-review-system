@@ -1,5 +1,6 @@
 package org.example.bookreview.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.bookreview.DTOs.ReviewDTO;
 import org.example.bookreview.DTOs.ReviewMapper;
 import org.example.bookreview.model.Book;
@@ -74,7 +75,36 @@ public class ReviewService {
     public List<ReviewDTO> getAllReviews() {
         List<Review> reviews = reviewRepository.findAll();
         return reviews.stream()
-                .map(review -> new ReviewDTO(review.getId(), review.getRating(), review.getText(), review.getBook().getId(), review.getUser().getId(), review.getUser().getUsername()))
+                .map(review -> new ReviewDTO(review.getId(), review.getRating(), review.getText(), review.getBook().getId(), review.getUser().getId(), review.getUser().getUsername(), review.getHelpfulCount()))
                 .collect(Collectors.toList());
     }
+
+    public void markReviewAsHelpful(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("Review not found"));
+
+        if (!review.getHelpfulUserIds().contains(userId)) {
+            review.setHelpfulCount(review.getHelpfulCount() + 1);
+            review.getHelpfulUserIds().add(userId);
+            reviewRepository.save(review);
+        } else {
+            throw new IllegalStateException("User has already marked this review as helpful");
+        }
+    }
+
+    public void unmarkReviewAsHelpful(Long reviewId, Long userId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new EntityNotFoundException("Review not found"));
+
+        if (review.getHelpfulUserIds().contains(userId)) {
+            review.setHelpfulCount(review.getHelpfulCount() - 1);
+            review.getHelpfulUserIds().remove(userId);
+            reviewRepository.save(review);
+        } else {
+            throw new IllegalStateException("User has not marked this review as helpful");
+        }
+    }
+
+
+
 }

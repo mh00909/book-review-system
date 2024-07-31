@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Home</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="auth.js"></script>
+
 </head>
 <body>
 <header>
@@ -25,14 +25,40 @@
     </div>
 </header>
 <main>
-    <section id="newbooks">
-
+    <section id="welcome">
+        <h1>Welcome to BookRev!</h1>
+        <p>Discover new books, read reviews, and connect with fellow readers.</p>
     </section>
+    <section id="features">
+        <h2>Explore Our Features</h2>
+        <div class="feature">
+            <h3>Discover Books</h3>
+            <p>Explore our vast collection of books from various genres.</p>
+        </div>
+        <div class="feature">
+            <h3>Read and Write Reviews</h3>
+            <p>Share your thoughts on books you've read and help others find their next favorite. Read reviews from other users to get insights on books before you read them.</p>
+        </div>
+        <div class="feature">
+            <h3>Join the Community</h3>
+            <p>Become a part of our community of book enthusiasts.</p>
+        </div>
+        <div class="feature">
+            <h3>Stay Updated</h3>
+            <p>Keep up with the latest book news, author interviews, and upcoming book releases. Never miss out on what's happening in the literary world.</p>
+        </div>
+    </section>
+    <section id="join-community">
+        <h2>Join Our Community</h2>
+        <p>Connect with fellow book lovers, share reviews, and discover new favorites. <a href="/register.html">Sign up now!</a></p>
+    </section>
+
 </main>
 <footer>
     <p>&copy; 2024 BookRev</p>
 </footer>
 <script src="scripts.js"></script>
+<script src="auth.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         displayUserInfo();

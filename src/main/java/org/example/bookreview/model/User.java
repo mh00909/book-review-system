@@ -1,6 +1,7 @@
 package org.example.bookreview.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,14 +34,14 @@ public class User implements UserDetails {
     private String lastName;
     @Getter @Setter
     private String email;
-    @Getter @Setter
+    @Getter @Setter @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Getter @Setter private ERole role;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Getter @Setter private List<Review> reviews = new ArrayList<>();
+    @Getter @Setter @JsonIgnore private List<Review> reviews = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(

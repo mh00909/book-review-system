@@ -12,7 +12,7 @@ public class BookMapper {
                 .map(category -> new CategoryDTO(category.getId(), category.getName()))
                 .collect(Collectors.toList());
         List<ReviewDTO> reviewDTOs = book.getReviews().stream()
-                .map(review -> new ReviewDTO(review.getId(), review.getRating(), review.getText(), review.getBook().getId(), review.getUser().getId(), review.getUser().getUsername()))
+                .map(review -> new ReviewDTO(review.getId(), review.getRating(), review.getText(), review.getBook().getId(), review.getUser().getId(), review.getUser().getUsername(), review.getHelpfulCount()))
                 .collect(Collectors.toList());
 
         return new BookDTO(book.getId(), book.getTitle(), authorDTO, categoryDTOs, reviewDTOs, book.getReaders().size(), book.getAverageRating()

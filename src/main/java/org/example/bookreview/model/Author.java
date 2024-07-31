@@ -1,6 +1,7 @@
 package org.example.bookreview.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +20,7 @@ public class Author {
     @Getter @Setter private String lastName;
 
     @OneToMany(mappedBy = "author", fetch=FetchType.LAZY)
-    @JsonBackReference
+    @JsonManagedReference
     @Getter @Setter private List<Book> bookList = new ArrayList<>();
 
     public Author (){}
