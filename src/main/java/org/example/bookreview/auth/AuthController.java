@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+/**
+ * Controller for handling registration and authentication.
+ */
 
 @RestController
 @RequestMapping("/api")
@@ -32,6 +34,14 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService userDetailsService;
 
+    /**
+     * Constructor for injecting dependencies.
+     * @param authenticationManager
+     * @param jwtUtils
+     * @param userRepository
+     * @param passwordEncoder
+     * @param userDetailsService
+     */
     @Autowired
     public AuthController(AuthenticationManager authenticationManager, JwtUtils jwtUtils,
                           UserRepository userRepository, PasswordEncoder passwordEncoder,
@@ -43,6 +53,11 @@ public class AuthController {
         this.userDetailsService = userDetailsService;
     }
 
+    /**
+     * Authenticates a user based on provided credentails.
+     * @param authRequest containing username and password
+     * @return ResponseEntity with a JWT token (success) or an error message (failure)
+     */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         try {
@@ -60,6 +75,11 @@ public class AuthController {
         }
     }
 
+    /**
+     * Registers a new user.
+     * @param registerRequest containing user details.
+     * @return ResponseEntity with a JWT Token (success) or an error message (failure)
+     */
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest registerRequest) {
         if (userRepository.findByUsername(registerRequest.getUsername()) != null) {
@@ -89,6 +109,10 @@ public class AuthController {
         }
     }
 }
+
+/**
+ * Data Transfer Objects
+ */
 
 class AuthRequest {
     @Getter @Setter

@@ -1,6 +1,4 @@
 package org.example.bookreview.controller;
-
-import com.sun.security.auth.UserPrincipal;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,11 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+/**
+ * Controller for handling user-related operations.
+ */
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -92,6 +91,9 @@ public class UserController {
 
 }
 
+/**
+ * DTO for user information response.
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -99,6 +101,9 @@ class UserInfoResponse {
     private String username;
 }
 
+/**
+ * DTO for updating user details.
+ */
 @Getter
 @Setter
 @AllArgsConstructor

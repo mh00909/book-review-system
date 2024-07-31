@@ -14,11 +14,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * Class for working with JWT tokens.
+ */
 @Component
 public class JwtUtils {
 
     public static final String SECRET_KEY = "A698C499A69C4EE9998356D773B479F75E181E17274F293E985DC691CCFDA658";
 
+    /**
+     * Extracts the username from the given JWT token.
+     * @param token
+     * @return the username
+     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -27,11 +35,24 @@ public class JwtUtils {
         return extractClaim(token, Claims::getExpiration);
     }
 
+    /**
+     * Extracts a specific claim from the JWT token.
+     * @param token
+     * @param claimsResolver - a function that resolves the desired claim
+     * @return the extracted claim
+     * @param <T> - the type of the claim
+     */
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
+    /**
+     * Extracts all claims from given JWT token.
+     * @param token
+     * @return the claims
+     * @throws RuntimeException if the token is expired or has invalid signature
+     */
     private Claims extractAllClaims(String token) {
         try {
             return Jwts.parserBuilder()
@@ -56,8 +77,6 @@ public class JwtUtils {
     }
 
     public Long extractUserId(String token) {
-       // Claims claims = extractAllClaims(token);
-        //return claims.get("userId", Long.class);
         final Claims claims = extractAllClaims(token);
         return Long.valueOf(claims.get("userId").toString());
     }

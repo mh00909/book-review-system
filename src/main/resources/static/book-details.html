@@ -56,32 +56,23 @@
     async function loadBookDetails() {
         const urlParams = new URLSearchParams(window.location.search);
         const bookId = urlParams.get('id');
-
-        console.log("Loading details for book ID:", bookId);
-
         if (!bookId) {
             alert("Book ID not found in URL");
             return;
         }
-
         try {
             const response = await fetch(`/api/books/${bookId}`);
             if (!response.ok) {
                 throw new Error("Failed to fetch book details");
             }
             const book = await response.json();
-
-            console.log("Book data:", book);
-
             displayBookDetails(book);
 
             if (isUser()) {
                 const userReview = book.reviews.find(review => review.userId === getCurrentUserId());
                 if (userReview) {
-                    console.log("Populating review form with existing review:", userReview);
                     populateReviewForm(userReview);
                 } else {
-                    console.log("No review found for current user. Displaying review form.");
                     document.getElementById('review-form-container').style.display = 'block';
                 }
             }
@@ -99,12 +90,10 @@
     function getCurrentUserId() {
         const token = localStorage.getItem('token');
         if (!token) {
-            console.log("No token found in localStorage");
             return null;
         }
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
-            console.log("Current user ID:", payload.userId);
             return payload.userId;
         } catch (error) {
             console.error("Error parsing token payload:", error);

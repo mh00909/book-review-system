@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for handling HTTP requests related to books and their reviews.
+ * Provides endpoints for CRUD operations on books and managing reviews.
+ */
+
 @RestController
 @RequestMapping("/api/books")
 public class BookController {

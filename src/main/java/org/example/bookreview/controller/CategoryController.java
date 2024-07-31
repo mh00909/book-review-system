@@ -3,10 +3,14 @@ package org.example.bookreview.controller;
 import org.example.bookreview.model.Category;
 import org.example.bookreview.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+/**
+ * Controller for handling HTTP requests related to book categories.
+ *
+ */
 
 @RestController
 @RequestMapping("/api/categories")

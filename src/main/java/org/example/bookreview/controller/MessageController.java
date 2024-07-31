@@ -12,6 +12,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for handling HTTP requests related to messaging between users.
+ * Provides endpoints for sending and retrieving messages.
+ */
+
 @RestController
 @RequestMapping("/api/messages")
 public class MessageController {

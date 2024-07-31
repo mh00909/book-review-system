@@ -1,7 +1,6 @@
 package org.example.bookreview.controller;
 
 import org.example.bookreview.DTOs.ReviewDTO;
-import org.example.bookreview.DTOs.ReviewRequest;
 import org.example.bookreview.service.ReviewService;
 import org.example.bookreview.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+/**
+ * Controller for handling HTTP requests related to book reviews.
+ * Provides endpoints for CRUD operations on reviews and marking them as helpful.
+ */
 
 @RestController
 @RequestMapping("/api/reviews")

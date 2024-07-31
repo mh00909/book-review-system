@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * Controller for handling HTTP requests related to authors.
+ * Provides endpoints for CRUD operations on authors.
+ */
+
 @RestController
 @RequestMapping("/api/authors")
 public class AuthorController {
